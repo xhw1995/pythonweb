@@ -25,8 +25,8 @@ SECRET_KEY = 'paa@6in8=evptf=_gkf)@=#=^f-4n(mj-fx)qn-tgc(nqe^-4e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# 默认是127.0.0.1
+ALLOWED_HOSTS = ['192.168.59.130', '127.0.0.1']
 
 # Application definition
 
@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 注册子应用
+    'video',    # 方法1
+    #'video.apps.VideoConfig',   # 方法2
 ]
 
 MIDDLEWARE = [
@@ -47,19 +50,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # add app
-    # demo1
-    # 'book'
-    # demo2
-    'video.apps.VideoConfig'
 ]
 
+# URL入口
 ROOT_URLCONF = 'videomanager.urls'
 
+# 模板配置相关
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        # 设置模板查找路径
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -108,9 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
