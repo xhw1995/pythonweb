@@ -55,8 +55,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 注册子应用
-    'video',    # 方法1
-    #'video.apps.VideoConfig',   # 方法2
+    #'video',    # 方法1
+    'video.apps.VideoConfig',   # 方法2
 ]
 
 MIDDLEWARE = [
