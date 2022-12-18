@@ -15,6 +15,18 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# print(__file__)
+# /home/qwer/Desktop/pythonweb/day01/videomanager/videomanager/settings.py
+
+# print(os.path.abspath(__file__))
+# /home/qwer/Desktop/pythonweb/day01/videomanager/videomanager/settings.py
+
+# dirname()：获取文件的目录
+# os.path.dirname(os.path.abspath(__file__))
+# /home/qwer/Desktop/pythonweb/day01/videomanager/videomanager
+
+# BASE_DIR = /home/qwer/Desktop/pythonweb/day01/videomanager/
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -23,9 +35,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'paa@6in8=evptf=_gkf)@=#=^f-4n(mj-fx)qn-tgc(nqe^-4e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+"""
+调试模式
+开发时，开启此模式，可以看到更多的信息
+上线后，需要改为False，关闭此模式
+"""
 DEBUG = True
 
-# 默认是127.0.0.1
+# 允许以什么形式来访问项目，默认是127.0.0.1
 ALLOWED_HOSTS = ['192.168.59.130', '127.0.0.1']
 
 # Application definition
