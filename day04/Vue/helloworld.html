@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--
+        1 导入vue.js
+        2 定义一个标签，接管标签中的内容
+        3 创建vue实例。让vue实例获取 HTML
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <!-- 写HTML相关内容 -->
+    <!-- 双大括号 语法形式 -->
+    <span> {{ message }} </span><br>
+    <span> [[ message ]] </span><br>
+
+    <hr>
+    <a v-bind:href="next">[[ info ]]</a>
+
+    <hr>
+    <a href="#" v-if="isLogin">个人中心</a>
+    <a href="#" v-else>登录</a>
+
+    <hr>
+    <a href="#" v-if="level === 1">皇帝</a>
+    <a href="#" v-else-if="level === 2">王爷</a>
+    <a href="#" v-else-if="level === 3">大臣</a>
+    <a href="#" v-else>平民</a>
+
+    <hr>
+    <span v-if="seen">if</span>
+    <span v-show="seen">show</span>
+
+    <hr>
+    <ul>
+        <!-- v-for="变量名 in 列表变量名" -->
+        <!-- <li v-for="shop in shops">[[ shop ]]</li> -->
+
+        <!-- v-for="(列表元素, 索引) in 变量名" -->
+        <!-- <li v-for="(shop,index) in shops">位于[[ shop ]]的第[[ index+1 ]]家店</li> -->
+
+        <!-- 对象 -->
+        <!-- <li v-for="value in object">[[ value ]]</li> -->
+
+        <!-- v-for="(值, 键) in 变量名" -->
+        <li v-for="(value,key) in object">[[ key ]]: [[ value ]]</li>
+    </ul>
+
+    <hr>
+    <button v-on:click="counter += 1">加一</button>
+    <span>结果: [[ counter ]]</span>
+    <hr>
+    <button v-on:click="login">注册</button>
+    <hr>
+    <button v-on:click="sayHi('哆啦A梦')">sayHi</button>
+</div>
+</body>
+<script type="text/javascript">
+    // js 单行注释
+    /*
+        var app 定义一个变量
+        new Vue() 实例化
+        el: '#app' 相当于 js document.getElementById('app')
+            获取div标签
+        data 变量
+    */
+    var app = new Vue({
+        el: '#app',
+        delimiters: ['[[', ']]'],
+        data: {
+            message: 'Hello Vue!',
+            info: '点击一下',
+            next: 'https://www.baidu.com',
+            isLogin: true,
+            level: 2,
+            seen: false,
+            shops: ['北京', '上海', '广州', '深圳', '南京'],
+            object: {
+                title: 'How to do lists in Vue',
+                author: 'Jane Doe',
+                publishedAt: '2016-04-10',
+            },
+            counter: 1,
+        },
+        methods: {
+            // 函数
+            login: function (){
+                alert('登录中~~~~')
+            },
+            sayHi: function (message){
+                alert(message)
+            }
+        }
+    })
+</script>
+</html>
