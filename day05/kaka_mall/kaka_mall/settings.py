@@ -25,7 +25,7 @@ SECRET_KEY = 'ya*6t&u9n_(%q_clld%5^!8$ih*6^dslg2q=6+vs2ol#crz+cl'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'www.kaka.site']
 
 
 # Application definition
