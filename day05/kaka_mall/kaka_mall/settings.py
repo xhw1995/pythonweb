@@ -186,3 +186,9 @@ LOGGING = {
         },
     }
 }
+
+""" 
+自定义模型覆盖 Django默认User模型
+点式路径：Django应用名称(必须位于你的INSTALLED_APPS中).作为User模型的Django模型名称
+"""
+AUTH_USER_MODEL = 'users.User'
