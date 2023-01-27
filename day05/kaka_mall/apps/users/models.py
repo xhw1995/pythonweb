@@ -15,7 +15,7 @@ from django.db import models
 2 django 自带用户模型
 自带模型有 密码加密和密码验证功能
 """
-# from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     mobile = models.CharField(max_length=11, unique=True)

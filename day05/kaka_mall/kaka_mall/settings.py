@@ -11,10 +11,12 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -25,7 +27,7 @@ SECRET_KEY = 'ya*6t&u9n_(%q_clld%5^!8$ih*6^dslg2q=6+vs2ol#crz+cl'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'www.kaka.site']
+ALLOWED_HOSTS = ['127.0.0.1', 'www.kaka.site', ]
 
 
 # Application definition
@@ -38,13 +40,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.users',
+    # CORS
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    # CORS 配置放在最上面
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -192,3 +199,14 @@ LOGGING = {
 点式路径：Django应用名称(必须位于你的INSTALLED_APPS中).作为User模型的Django模型名称
 """
 AUTH_USER_MODEL = 'users.User'
+
+"""
+CORS 白名单
+"""
+CORS_ALLOWED_ORIGIN = [
+    'http://128.0.0.1:8080',
+    'http://localhost:8080',
+    'http://www.kaka.site:8080',
+    'http://www.kaka.site:8000',
+]
+CORS_ALLOW_CREDENTIALS = True    # 允许携带cookie
