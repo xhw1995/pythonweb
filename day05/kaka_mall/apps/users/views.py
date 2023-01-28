@@ -125,5 +125,17 @@ class RegisterView(View):
         except Exception as e:
             return JsonResponse({'code': 400, 'errmsg': "注册失败"})
 
+        """
+        1 注册成功，立刻登录
+            状态保持
+                1.1 客户端存储信息 cookie
+                1.2 服务存储信息使用 Session
+        2 注册成功，单独登录
+        """
+        # Django 提供状态保持方法
+        from django.contrib.auth import login
+        # 状态保持 -- 登录用户的状态保持
+        login(request, user)
+
         # 5 返回相应
         return JsonResponse({'code': 0, 'errmsg': '注册成功'})
