@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
 # Create your views here.
@@ -48,3 +48,64 @@ class ImageCodeView(View):
         图片：image/jpeg，image/git，image/png
         """
         return HttpResponse(image,content_type='image/jpeg')
+
+"""
+前端
+    用户输入 手机号和图片验证码 后，前端发送axios请求
+
+后端
+    请求：接收请求，获取请求参数（路由：手机号；查询字符串：UUID、图片验证码）
+    业务逻辑：验证参数，验证图片验证码，生成短信验证码，保存短信验证码，发送短信验证码
+    响应：返回JSON数据
+        {'code':0, 'errmsg':'ok'}
+    路由： GET 
+
+步骤：
+    1 获取请求参数
+    2 验证参数
+    3 验证图片验证码
+    4 生成短信验证码
+    5 保存短信验证码
+    6 发送短信验证码
+    7 返回响应
+
+debug 模式（调试模式）
+debug + 断点：可以看到程序执行过程
+在函数体的第一行添加断点！！！
+"""
+class SmscodeView(View):
+    def get(self, request, mobile):
+        # 1 获取请求参数
+        image_code = request.GET.get('image_code')
+        uuid = request.GET.get('image_code_id')
+        # 2 验证参数
+        if not all([image_code, uuid]):
+            return JsonResponse({'code': 400, 'errmsg': "参数不全"})
+        # 3 验证图片验证码
+        # 3.1 链接Redis
+        from django_redis import get_redis_connection
+        redis_cli = get_redis_connection('captcha')
+        # 3.2 获取Redis数据
+        redis_image_code = redis_cli.get('uuid')
+        if redis_image_code is None:
+            return JsonResponse({'code': 400, 'errmsg': "图片验证码已过期"})
+        # 3.3 对比数据
+        """
+        注意
+            redis_image_code：bytes类型
+            image_code：str类型
+        两者类型不同，需要转换类型
+        以防万一，两者都小写处理
+        """
+        if redis_image_code.decode().lower() != image_code.lower():
+            return JsonResponse({'code': 400, 'errmsg': "图片验证码错误"})
+        # 4 生成oo短信验证码
+        from random import randint
+        sms_code = '%06d'%randint(0, 999999)
+        # 5 保存短信验证码
+        redis_cli.setex(mobile, 300, sms_code)
+        # 6 发送短信验证码
+        from libs.yuntongxun.sms import CCP
+        CCP.send_template_sms('13312341234', [sms_code, 5], 1)
+        # 7 返回响应
+        return JsonResponse({'code': 0, 'errmsg': 'ok'})
