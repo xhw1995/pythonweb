@@ -73,7 +73,7 @@ debug 模式（调试模式）
 debug + 断点：可以看到程序执行过程
 在函数体的第一行添加断点！！！
 """
-class SmscodeView(View):
+class SmsCodeView(View):
     def get(self, request, mobile):
         # 1 获取请求参数
         image_code = request.GET.get('image_code')
@@ -99,13 +99,38 @@ class SmscodeView(View):
         """
         if redis_image_code.decode().lower() != image_code.lower():
             return JsonResponse({'code': 400, 'errmsg': "图片验证码错误"})
+        # 5.3 提取发送短信的标记
+        send_flag = redis_cli.get('send_flag_%s'%mobile)
+        if send_flag is not None:
+            return JsonResponse({'code': 400, 'errmsg': "不要频繁发送短信"})
         # 4 生成oo短信验证码
         from random import randint
         sms_code = '%06d'%randint(0, 999999)
-        # 5 保存短信验证码
-        redis_cli.setex(mobile, 300, sms_code)
-        # 6 发送短信验证码
-        from libs.yuntongxun.sms import CCP
-        CCP.send_template_sms('13312341234', [sms_code, 5], 1)
+
+        # # 5.1 保存短信验证码
+        # redis_cli.setex(mobile, 300, sms_code)
+        # # 5.2 添加一个发送标记：有效期60秒，内容随意
+        # redis_cli.setex('send_flag_%s'%mobile, 60, 1)
+
+        # 5.4 pipeline管道 实现5.1和5.2
+        # 5.4.1 新建一个管道
+        pipeline = redis_cli.pipeline()
+        # 5.4.2 管道收集指令
+        pipeline.setex(mobile, 300, sms_code)
+        pipeline.setex('send_flag_%s'%mobile, 60, 1)
+        # 5.4.3 管道执行指令
+        pipeline.execute()
+
+        # 6.1 发送短信验证码
+        #from libs.yuntongxun.sms import CCP
+        #CCP.send_template_sms(mobile, [sms_code, 5], 1)
+        # 6.2 celery异步发送短信（替换6.1）
+        from celery_tasks.sms.tasks import celery_send_sms_code
+        """
+        因为被task装饰器装饰，有delay函数
+        delay的参数 等同于 任务（函数）的参数
+        """
+        celery_send_sms_code.delay(mobile, sms_code)
+
         # 7 返回响应
         return JsonResponse({'code': 0, 'errmsg': 'ok'})
