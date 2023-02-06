@@ -6,4 +6,6 @@ urlpatterns = [
     path('usernames/<username:username>/count/', views.UsernameCountView.as_view()),
     # 注册
     path('register/', views.RegisterView.as_view()),
+    # 登录
+    path('login/', views.LoginView.as_view()),
 ]

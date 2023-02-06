@@ -139,3 +139,61 @@ class RegisterView(View):
 
         # 5 返回相应
         return JsonResponse({'code': 0, 'errmsg': '注册成功'})
+
+"""
+登录
+前端
+    用户输入用户名和密码后，点击登录按钮。前端发送axios请求
+
+后端
+    请求：接收数据，验证数据
+    业务逻辑：验证用户名和密码，session
+    响应：返回JSON数据
+
+步骤
+    1 接收数据
+    2 验证数据
+    3 验证用户名和密码
+    4 session
+    5 判断是否记住登录
+    6 返回响应
+"""
+class LoginView(View):
+    def post(self, request):
+        # 1 接收数据
+        data = json.loads(request.body.decode())
+        username = data.get('username')
+        password = data.get('password')
+        remembered = data.get('remembered')
+        # 2 验证数据
+        if not all([username, password]):
+            return JsonResponse({'code': 400, 'errmsg': "参数不全"})
+        # 3 验证用户名和密码
+        """
+        方法1
+        通过模型，根据用户名来查询
+        User.objects.get(username=username)
+        
+        方法2
+        系统提供方法 authenticate
+        authenticate 传递用户名和密码
+        正确：返回User信息
+        错误：返回None
+        """
+        from django.contrib.auth import authenticate
+        user = authenticate(username=username, password=password)
+        if user is None:
+            return JsonResponse({'code': 400, 'errmsg': "用户名或密码错误"})
+        # 4 session
+        from django.contrib.auth import login
+        login(username, password)
+        # 5 判断是否记住登录
+        # 实质就是设置 session的过期时间
+        if remembered is True:
+            # 记住登录 -- 2周 或 1个月
+            request.session.set_expiry(None)
+        else:
+            # 不记住登录 -- 浏览器关闭 session过期
+            request.session.set_expiry(0)
+        # 6 返回响应
+        return JsonResponse({'code': 0, 'errmsg': "ok"})
