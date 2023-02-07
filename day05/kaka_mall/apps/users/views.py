@@ -210,3 +210,25 @@ class LoginView(View):
         # 设置cookie信息：使首页显示用户信息
         response.set_cookie('username', username, max_age=3600*24)
         return response
+
+"""
+退出
+前端
+    用户点击退出按钮，前端发送一个axios delete请求
+
+后端
+    请求：无
+    业务逻辑：退出
+    响应：返回JSON数据
+"""
+class LogoutView(View):
+    def delete(self, request):
+        from django.contrib.auth import logout
+        # 1 清除session信息
+        logout(request)
+
+        response = JsonResponse({'code': 0, 'errmsg': "ok"})
+        # 2 清除cookie信息
+        # 因为前端是根据cookie信息，判断用户是否登录，所以要清除
+        response.delete_cookie('username')
+        return response
