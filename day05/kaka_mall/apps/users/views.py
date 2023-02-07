@@ -168,6 +168,16 @@ class LoginView(View):
         # 2 验证数据
         if not all([username, password]):
             return JsonResponse({'code': 400, 'errmsg': "参数不全"})
+        # 2.1 确定是根据 用户名 还是 手机号 查询
+        """
+        通过修改 User.USERNAME_FIELD 字段，影响 authenticate 的查询
+        """
+        import re
+        if re.match('1[3-9]\d{9}', username):
+            User.USERNAME_FIELD = 'mobile'
+        else:
+            User.USERNAME_FIELD = 'username'
+
         # 3 验证用户名和密码
         """
         方法1
@@ -196,4 +206,7 @@ class LoginView(View):
             # 不记住登录 -- 浏览器关闭 session过期
             request.session.set_expiry(0)
         # 6 返回响应
-        return JsonResponse({'code': 0, 'errmsg': "ok"})
+        response = JsonResponse({'code': 0, 'errmsg': "ok"})
+        # 设置cookie信息：使首页显示用户信息
+        response.set_cookie('username', username, max_age=3600*24)
+        return response
