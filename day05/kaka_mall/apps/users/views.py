@@ -232,3 +232,32 @@ class LogoutView(View):
         # 因为前端是根据cookie信息，判断用户是否登录，所以要清除
         response.delete_cookie('username')
         return response
+
+"""
+LoginRequiredMixin
+    未登录用户 会返回 重定向
+    重定向 并不是JSON数据
+    
+方法一 将LoginRequiredMixin类重写为LoginRequiredJSONMixin，让CenterView继承LoginRequiredJSONMixin
+from django.contrib.auth.mixins import AccessMixin
+class LoginRequiredJSONMixin(AccessMixin):
+    # Verify that the current user is authenticated.
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # 此处修改为返回JSON数据
+            return JsonResponse({'code': 400, 'errmsg': "用户尚未登录"})
+        return super().dispatch(request, *args, **kwargs)
+
+方法二 定义LoginRequiredJSONMixin类，继承LoginRequiredMixin。重写 handle_no_permission方法
+from django.contrib.auth.mixins import LoginRequiredMixin
+class LoginRequiredJSONMixin(LoginRequiredMixin):
+    def handle_no_permission(self):
+        return JsonResponse({'code': 400, 'errmsg': "用户尚未登录"})
+        
+通用功能放入 utils.views 中
+"""
+from utils.views import LoginRequiredJSONMixin
+class CenterView(LoginRequiredJSONMixin, View):
+    def get(self, request):
+        return JsonResponse({'code': 0, 'errmsg': "ok"})
