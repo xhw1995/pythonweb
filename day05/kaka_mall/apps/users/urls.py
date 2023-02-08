@@ -11,5 +11,5 @@ urlpatterns = [
     # 退出
     path('logout/', views.LogoutView.as_view()),
     # 用户中心
-    path('center/', views.CenterView.as_view()),
+    path('info/', views.CenterView.as_view()),
 ]
