@@ -262,7 +262,12 @@ class CenterView(LoginRequiredJSONMixin, View):
     def get(self, request):
 
         info_data = {
-            # request.user 就是已登录的用户信息
+            """
+            request.user 就是已登录的用户信息
+            来源于中间件 django.contrib.auth.middleware.AuthenticationMiddleware
+            系统会判断 如果是登录用户，则获取 登录用户对应的 模型实例数据
+            如果不是登录用户，则request.user = AnonymousUser() 匿名用户
+            """
             'username': request.user.username,
             'mobile': request.user.mobile,
             'email': request.user.email,
@@ -270,3 +275,45 @@ class CenterView(LoginRequiredJSONMixin, View):
         }
 
         return JsonResponse({'code': 0, 'errmsg': "ok", 'info_data': info_data})
+
+"""
+需求
+    1 保存邮箱地址
+    2 发送一封激活邮件
+    3 用户激活邮件
+    
+前端
+    用户输入邮箱后，点击保存。此时发送axios请求
+
+后端
+    请求：接收请求，获取数据
+    业务逻辑：保存邮箱地址，发送激活邮件
+    响应：返回JSON code=0
+    路由：PUT请求
+
+步骤
+    1 接收请求
+    2 获取数据
+    3 保存邮箱地址
+    4 发送激活邮件
+    5 返回响应
+"""
+class EmailView(LoginRequiredJSONMixin, View):
+    def put(self, request):
+        # 1 接收请求
+        # put 和 post类似，数据存于body
+        data = json.loads(request.body.decode())
+
+        # 2.1 获取数据
+        email = data.get('email')
+        # 2.2 验证邮箱
+
+        # 3 保存邮箱地址
+        user = request.user  # user / request.user 就是 登录用户的实例对象
+        user.email = email
+        user.save()
+        # 4 发送激活邮件
+
+        # 5 返回响应
+        return JsonResponse({'code': 0, 'errmsg': "ok"})
+    

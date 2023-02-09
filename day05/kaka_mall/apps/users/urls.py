@@ -12,4 +12,6 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view()),
     # 用户中心
     path('info/', views.CenterView.as_view()),
+    # 邮箱
+    path('emails/', views.EmailView.as_view())
 ]
