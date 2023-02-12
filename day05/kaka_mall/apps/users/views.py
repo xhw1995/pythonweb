@@ -329,9 +329,40 @@ class EmailView(LoginRequiredJSONMixin, View):
         message = "点击按钮，进行激活<a href='http://www.kaka.cn'>点击激活</a>"
         from_email = "美多商城<qi_rui_hua@163.com>"
         recipient_list = ['2249932727@qq.com']
-        # 邮件内容是 html时，需要使用html_message
-        html_message = "点击按钮，进行激活<a href='http://www.kaka.cn'>点击激活</a>"
-        send_mail(subject=subject, message=message, html_message=html_message, from_email=from_email, recipient_list=recipient_list)
+        """
+        邮件内容是 html时，需要使用html_message
+        
+        封装思想
+            将 一些实现特定功能的代码 封装成一个函数（方法）
+        目的
+            解耦 --- 当需求发送改变时，对代码的修改影响小
+        步骤
+            1 要封装的代码 定义到一个函数（方法）中
+            2 优化封装的代码
+            3 验证封装的代码
+        
+        4.1 对a标签的数据，进行加密处理
+        传入参数 user_id = 1
+        """
+        from apps.users.utils import generic_email_verify_token
+        token = generic_email_verify_token(user_id=request.user.id)
+
+        verify_url = "http://www.meidu.site:8080/success_verify_email.html?token=%s"%token
+        # 4.2 组织激活邮件
+        html_message = '<p>用户您好！</p>'\
+                       '<p>感谢使用商城</p>'\
+                       '<p>您的邮箱为：%s。请点击以下链接激活您的邮箱：</p>'\
+                       '<p><a href="%s">%s</a></p>' % (email, verify_url, verify_url)
+
+        # 4.3 异步发送邮件
+        #send_mail(subject=subject,
+        #          message=message,
+        #          html_message=html_message,
+        #          from_email=from_email,
+        #          recipient_list=recipient_list)
+        from celery_tasks.email.tasks import celery_send_email
+        celery_send_email.delay(subject=subject, message=message, html_message=html_message, from_email=from_email, recipient_list=recipient_list)
+
         # 5 返回响应
         return JsonResponse({'code': 0, 'errmsg': "ok"})
 

@@ -48,4 +48,4 @@ app.config_from_object('celery_tasks.config')
 参数
     列表：列表元素是 tasks的路径
 """
-app.autodiscover_tasks(['celery_tasks.sms'])
+app.autodiscover_tasks(['celery_tasks.sms', 'celery_tasks.email'])
