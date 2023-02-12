@@ -218,3 +218,19 @@ CORS_ALLOWED_ORIGIN = [
     'http://www.kaka.site:8000',
 ]
 CORS_ALLOW_CREDENTIALS = True    # 允许携带cookie
+
+"""
+邮件发送
+"""
+# 让django的哪个类发送邮件
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# 发送邮件服务器
+EMAIL_HOST = 'smtp.163.com'
+# 发送邮件端口号
+EMAIL_PORT = 25
+# 发送邮件的邮箱
+EMAIL_HOST_USER = 'qi_rui_hua@163.com'
+# 邮箱中设置的客户端授权码
+EMAIL_HOST_PASSWORD = '123456abc'
+# 收件人看到的发件人
+#EMAIL_FROM = '美多商城'
