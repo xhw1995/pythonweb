@@ -13,5 +13,7 @@ urlpatterns = [
     # 用户中心
     path('info/', views.CenterView.as_view()),
     # 邮箱
-    path('emails/', views.EmailView.as_view())
+    path('emails/', views.EmailView.as_view()),
+    # 邮箱激活
+    path('emails/verification/', views.EmailVerifyView.as_view()),
 ]
