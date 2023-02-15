@@ -431,15 +431,3 @@ class EmailVerifyView(View):
         # 7 返回JSON响应
         return JsonResponse({'code': 0, 'errmsg': "ok"})
 
-"""
-省市区
-id    name    parent_id
-10000 河北省   NULL
-
-10100 保定市   10000
-10200 石家庄市  10000
-10300 唐山市   10000
-
-10101 雄县    10100
-10102 安新县   10100
-"""
