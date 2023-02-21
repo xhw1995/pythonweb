@@ -23,7 +23,7 @@ from django.shortcuts import render
 """
 from django.views import View
 from users.models import User
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 import re
 
 class UsernameCountView(View):
@@ -430,4 +430,153 @@ class EmailVerifyView(View):
         user.save()
         # 7 返回JSON响应
         return JsonResponse({'code': 0, 'errmsg': "ok"})
+"""
+请求
+业务逻辑（数据库的增删改查）
+响应
 
+增（注册）
+    1 接收数据
+    2 验证数据
+    3 数据入库
+    4 返回响应
+删
+    1 查询指定数据
+    2 删除数据（物理删除，逻辑删除）
+    3 返回响应
+改（个人邮箱）
+    1 查询指定数据
+    2 接收数据
+    3 验证数据
+    4 数据更新
+    5 返回响应
+查（个人中心的数据展示，省市区）
+    1 查询指定数据
+    2 将对象数据转换为字典数据
+    3 返回响应
+"""
+
+"""
+需求
+    新增地址
+前端
+    用户填写地址信息后，前端发送axios请求，会携带相关信息（POST--body）
+后端
+    请求：接受请求
+    业务逻辑：数据入库
+    响应：返回响应
+    路由：POST    /addresses/create/
+步骤
+    1 接收数据
+    2 获取参数，验证参数
+    3 数据入库
+    4 返回响应
+"""
+from users.models import Address
+class AddressCreateView(LoginRequiredJSONMixin,View):
+    def post(self, request):
+        # 0 判断是否超过地址上限
+        #Address.objects.filter(user=request.user).count()
+        #count = request.user.addresses.count()
+        #if count >= constans.USER_ADDRESS_COUNTS_LIMIT:
+        #    return JsonResponse({'code': RETCODE.THROTTLINGERR, 'errmsg': "超过地址数量上限"})
+        # 1 接收数据
+        data = json.loads(request.body.decode())
+        # 2 获取参数，验证参数
+        receiver = data.get('receiver')
+        province_id = data.get('province_id')
+        city_id = data.get('city_id')
+        district_id = data.get('district_id')
+        place = data.get('place')
+        mobile = data.get('mobile')
+        tel = data.get('tel')
+        email = data.get('email')
+
+        user = request.user
+        # 2.1 验证必传参数
+        if not all([receiver, province_id, city_id, district_id, place, mobile]):
+            return HttpResponseBadRequest("缺少必传参数")
+        # 2.2 省市区id 是否正确
+
+        # 2.3 详细地址长度
+
+        # 2.4 手机号
+        if not re.match(r'^1[3-9]\d{9}&', mobile):
+            return HttpResponseBadRequest("手机号有误")
+        # 2.5 固定电话
+        if tel:
+            if not re.match(r'^(0[0-9]{2,3}-)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$', tel):
+                return HttpResponseBadRequest("固定电话有误")
+        # 2.6 邮箱
+        if email:
+            if not re.match(r'^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
+                return HttpResponseBadRequest("邮箱有误")
+
+        # 3 数据入库
+        address = Address.objects.create(
+            user=user,
+            title=receiver,
+            receiver=receiver,
+            province_id=province_id,
+            city_id=city_id,
+            district_id=district_id,
+            place =place,
+            mobile=mobile,
+            tel=tel,
+            email=email,
+        )
+        # 3.1 新增地址返回给前端，实现局部刷新
+        address_dict = {
+            "id": address.id,
+            "title": address.title,
+            "receiver": address.receiver,
+            "province": address.province.name,
+            "city": address.city.name,
+            "district": address.district.name,
+            "place": address.place,
+            "mobile": address.mobile,
+            "tel": address.tel,
+            "email": address.email
+        }
+
+        # 4 返回响应
+        return JsonResponse({'code': 0, 'errmsg': 'ok', 'address': address_dict})
+
+"""
+需求
+    获取地址数据
+前端
+
+后端
+    请求
+    业务逻辑
+    响应
+    路由：GET    /address/ 
+步骤
+    1 
+"""
+class AddressView(LoginRequiredJSONMixin, View):
+    def get(self, request):
+        # 1 查询指定数据
+        user = request.user
+        # 方法1
+        #addresses = user.addresses
+        # 方法2
+        addresses = Address.objects.filter(user=user, is_deleted=False)
+        # 2 将对象数据转换为字典数据
+        address_list = []
+        for address in addresses:
+            address_list.append({
+                "id": address.id,
+                "title": address.title,
+                "receiver": address.receiver,
+                "province": address.province.name,
+                "city": address.city.name,
+                "district": address.district.name,
+                "place": address.place,
+                "mobile": address.mobile,
+                "tel": address.tel,
+                "email": address.email
+            })
+        # 3 返回响应
+        return JsonResponse({'code': 0, 'errmsg': 'ok', 'addresses': address_list})

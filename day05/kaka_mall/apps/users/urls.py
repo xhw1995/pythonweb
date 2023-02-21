@@ -16,4 +16,8 @@ urlpatterns = [
     path('emails/', views.EmailView.as_view()),
     # 邮箱激活
     path('emails/verification/', views.EmailVerifyView.as_view()),
+    # 新增地址
+    path('addresses/create/', views.AddressCreateView.as_view()),
+    # 显示地址
+    path('addresses/', views.AddressView.as_view()),
 ]

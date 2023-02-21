@@ -6,6 +6,4 @@ urlpatterns = [
     path('areas/', views.AreaView.as_view()),
     # 查询市、区县信息
     path('areas/<id>/', views.SubAreaView.as_view()),
-    # 新增地址
-    path('addresses/create/', views.AddressCreateView.as_view()),
 ]
